@@ -1,135 +1,135 @@
 <template>
   <div id="app" v-cloak>
-    <transition name="fade">
-      <div class="screen" :key="currentScreen">
-        <!-- 欢迎界面 -->
-        <div v-if="currentScreen === 'welcome'" class="welcome-screen">
-          <game-header @settings="showSettings" @help="showHelp" />
-          <div class="welcome-container">
-            <div class="welcome-content">
-              <h1 class="welcome-title">五子棋游戏</h1>
-              <p class="welcome-subtitle">选择游戏模式和难度开始游戏</p>
-              
-              <div class="welcome-options">
-                <!-- 游戏模式选择 -->
-                <div class="option-section">
-                  <h2 class="section-title">游戏模式</h2>
-                  <div class="mode-buttons">
-                    <button 
-                      v-for="mode in gameModes" 
-                      :key="mode.id"
-                      class="mode-btn"
-                      :class="{ active: selectedMode === mode.id }"
-                      @click="selectMode(mode.id)"
-                    >
-                      <i :class="mode.icon"></i>
-                      <span>{{ mode.text }}</span>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- AI 难度选择 -->
-                <div class="option-section" :class="{ disabled: selectedMode !== 'pve' }">
-                  <h2 class="section-title">AI 难度</h2>
-                  <div class="difficulty-buttons">
-                    <button 
-                      v-for="level in difficultyLevels" 
-                      :key="level.id"
-                      class="difficulty-btn"
-                      :class="{ 
-                        active: selectedDifficulty === level.id,
-                        disabled: selectedMode !== 'pve'
-                      }"
-                      :disabled="selectedMode !== 'pve'"
-                      @click="selectDifficulty(level.id)"
-                    >
-                      <i :class="level.icon"></i>
-                      {{ level.text }}
-                    </button>
-                  </div>
+    <transition name="fade" mode="out-in">
+      <div v-if="currentScreen === 'welcome'" class="welcome-screen">
+        <div class="welcome-container">
+          <div class="welcome-header">
+            <button class="icon-btn" @click="showSettings">
+              <i class="fa-solid fa-gear"></i>
+            </button>
+            <button class="icon-btn" @click="showHelp">
+              <i class="fa-solid fa-circle-question"></i>
+            </button>
+          </div>
+          <div class="welcome-content">
+            <h1 class="welcome-title">五子棋</h1>
+            <p class="welcome-subtitle">经典的黑白对弈</p>
+            
+            <div class="welcome-options">
+              <!-- 游戏模式选择 -->
+              <div class="option-section">
+                <h2 class="section-title">游戏模式</h2>
+                <div class="mode-buttons">
+                  <button 
+                    v-for="mode in gameModes" 
+                    :key="mode.id"
+                    class="mode-btn"
+                    :class="{ active: selectedMode === mode.id }"
+                    @click="selectMode(mode.id)"
+                  >
+                    <i :class="mode.icon"></i>
+                    <span>{{ mode.text }}</span>
+                  </button>
                 </div>
               </div>
 
-              <button 
-                class="start-btn"
-                :disabled="!selectedMode"
-                @click="startGame"
-              >
-                开始游戏
-                <i class="fa-solid fa-play"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 游戏界面 -->
-        <div v-else class="game-screen">
-          <game-header @settings="showSettings" @help="showHelp" />
-          
-          <div class="game-layout">
-            <div class="game-sidebar">
-              <player-card
-                name="黑子玩家"
-                piece-color="black"
-                :is-active="currentPlayer === 'black'"
-                :is-ai="false"
-              />
-              <player-card
-                v-if="gameMode === 'pvp'"
-                name="白子玩家"
-                piece-color="white"
-                :is-active="currentPlayer === 'white'"
-                :is-ai="false"
-              />
-              <player-card
-                v-else
-                name="AI 对手"
-                piece-color="white"
-                :is-active="currentPlayer === 'white'"
-                :is-ai="true"
-                :is-thinking="isAIThinking"
-              />
-            </div>
-            
-            <div class="game-content">
-              <game-board
-                ref="gameBoard"
-                :board="board"
-                :current-player="currentPlayer"
-                :can-move="canMove && !gameOver"
-                @make-move="handleMove"
-              />
-            </div>
-            
-            <div class="game-controls">
-              <game-controls
-                :actions="gameActions"
-                @action="handleGameAction"
-              />
-            </div>
-          </div>
-
-          <!-- 游戏结果显示 -->
-          <div v-if="gameOver" class="game-result-overlay">
-            <div class="game-result">
-              <h2 class="result-title">
-                {{ getGameResultText() }}
-              </h2>
-              <div class="result-actions">
-                <button class="result-btn" @click="restartGame">
-                  <i class="fa-solid fa-rotate-right"></i>
-                  重新开始
-                </button>
-                <button class="result-btn" @click="backToMenu">
-                  <i class="fa-solid fa-house"></i>
-                  返回主菜单
-                </button>
+              <!-- AI 难度选择 -->
+              <div class="option-section" :class="{ disabled: selectedMode !== 'pve' }">
+                <h2 class="section-title">AI 难度</h2>
+                <div class="difficulty-buttons">
+                  <button 
+                    v-for="level in difficultyLevels" 
+                    :key="level.id"
+                    class="difficulty-btn"
+                    :class="{ 
+                      active: selectedDifficulty === level.id,
+                      disabled: selectedMode !== 'pve'
+                    }"
+                    :disabled="selectedMode !== 'pve'"
+                    @click="selectDifficulty(level.id)"
+                  >
+                    <i :class="level.icon"></i>
+                    {{ level.text }}
+                  </button>
+                </div>
               </div>
             </div>
+
+            <button 
+              class="start-btn"
+              :disabled="!selectedMode"
+              @click="startGame"
+            >
+              开始游戏
+              <i class="fa-solid fa-play"></i>
+            </button>
           </div>
         </div>
       </div>
+      <div v-else-if="currentScreen === 'game'" class="game-screen">
+        <div class="game-layout">
+          <div class="game-sidebar">
+            <player-card
+              name="黑子玩家"
+              piece-color="black"
+              :is-active="currentPlayer === 'black'"
+              :is-ai="false"
+            />
+            <player-card
+              :name="gameMode === 'pve' ? 'AI 玩家' : '白子玩家'"
+              piece-color="white"
+              :is-active="currentPlayer === 'white'"
+              :is-ai="gameMode === 'pve'"
+              :is-thinking="gameMode === 'pve' && currentPlayer === 'white' && !canMove"
+            />
+          </div>
+          
+          <div class="game-content">
+            <game-board
+              :board="board"
+              :current-player="currentPlayer"
+              :can-move="canMove && !(gameMode === 'pve' && currentPlayer === 'white')"
+              @make-move="makeMove"
+            />
+          </div>
+          
+          <div class="game-controls">
+            <button class="control-btn" @click="undoMove" :disabled="!canUndo">
+              <i class="fa-solid fa-rotate-left"></i>
+              悔棋
+            </button>
+            <button class="control-btn" @click="handleSurrender">
+              <i class="fa-solid fa-flag"></i>
+              认输
+            </button>
+            <button class="control-btn" @click="backToMenu">
+              <i class="fa-solid fa-house"></i>
+              返回主菜单
+            </button>
+          </div>
+        </div>
+      </div>
+      <online-game v-if="currentScreen === 'game' && selectedMode === 'online'" />
     </transition>
+    <install-prompt />
+    <update-prompt />
+    <div v-if="gameOver" class="game-result-overlay">
+      <div class="game-result">
+        <h2 class="result-title">
+          {{ winner ? (winner === 'black' ? '黑子胜利！' : '白子胜利！') : '平局！' }}
+        </h2>
+        <div class="result-actions">
+          <button class="result-btn" @click="restartGame">
+            <i class="fa-solid fa-rotate-right"></i>
+            再来一局
+          </button>
+          <button class="result-btn" @click="backToMenu">
+            <i class="fa-solid fa-house"></i>
+            返回主菜单
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -137,9 +137,21 @@
 import { ref, onMounted } from 'vue'
 import { AI } from './game/ai.js'
 import { setupAudio } from './audio/audio.js'
+import InstallPrompt from './components/InstallPrompt.vue'
+import UpdatePrompt from './components/UpdatePrompt.vue'
+import PlayerCard from './components/PlayerCard.vue'
+import GameBoard from './components/GameBoard.vue'
+import OnlineGame from './components/OnlineGame.vue'
 
 export default {
   name: 'App',
+  components: {
+    InstallPrompt,
+    UpdatePrompt,
+    PlayerCard,
+    GameBoard,
+    OnlineGame
+  },
   data() {
     return {
       currentScreen: 'welcome',
@@ -147,7 +159,8 @@ export default {
       selectedDifficulty: 'medium',
       gameModes: [
         { id: 'pvp', text: '双人对战', icon: 'fa-solid fa-user-group' },
-        { id: 'pve', text: '人机对战', icon: 'fa-solid fa-robot' }
+        { id: 'pve', text: '人机对战', icon: 'fa-solid fa-robot' },
+        { id: 'online', text: '在线对战', icon: 'fa-solid fa-globe' }
       ],
       difficultyLevels: [
         { id: 'easy', text: '简单', icon: 'fa-solid fa-circle-dot' },
@@ -163,250 +176,163 @@ export default {
         color: 'black'
       },
       player2: {
-        name: '白子玩家',
+        name: 'AI 对手',
         color: 'white'
       },
-      gameActions: [
-        { id: 'undo', text: '悔棋', icon: 'fa-solid fa-rotate-left' },
-        { id: 'restart', text: '重新开始', icon: 'fa-solid fa-arrows-rotate' },
-        { id: 'surrender', text: '认输', icon: 'fa-solid fa-flag' },
-        { id: 'back', text: '返回主菜单', icon: 'fa-solid fa-house' }
-      ],
       gameOver: false,
       winner: null,
       moveHistory: [],
-      isDraw: false,
-      ai: new AI(),
-      isAIThinking: false,
+      ai: null,
+      audio: null
     }
   },
-  
-  mounted() {
-    setupAudio()
-  },
-  
   methods: {
-    handleMove({ row, col }) {
-      if (!this.canMove || this.gameOver || this.board[row][col]) return
+    selectMode(mode) {
+      this.selectedMode = mode
+    },
+    selectDifficulty(level) {
+      this.selectedDifficulty = level
+    },
+    startGame() {
+      this.gameMode = this.selectedMode
+      this.currentScreen = 'game'
+      this.resetGame()
       
-      // 玩家落子
+      if (this.gameMode === 'pve') {
+        this.ai = new AI(this.selectedDifficulty)
+      }
+    },
+    resetGame() {
+      this.board = Array(15).fill().map(() => Array(15).fill(null))
+      this.currentPlayer = 'black'
+      this.gameOver = false
+      this.winner = null
+      this.moveHistory = []
+      this.canMove = true
+    },
+    makeMove(row, col) {
+      if (this.gameOver || this.board[row][col] || !this.canMove) return
+      
+      // 如果是 AI 回合，阻止玩家落子
+      if (this.gameMode === 'pve' && this.currentPlayer === 'white') return
+      
+      // 落子
       this.board[row][col] = this.currentPlayer
       this.moveHistory.push({ row, col, player: this.currentPlayer })
+      this.audio?.playPieceSound()
       
-      // 检查是否获胜
+      // 检查胜利
       if (this.checkWin(row, col)) {
         this.gameOver = true
         this.winner = this.currentPlayer
+        this.audio?.playWinSound()
         return
       }
       
-      // 检查是否平局
-      if (this.checkDraw()) {
-        this.gameOver = true
-        this.isDraw = true
-        return
-      }
+      // 切换玩家
+      this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black'
       
-      // 如果是 AI 模式且当前是玩家回合，让 AI 落子
-      if (this.gameMode === 'pve' && this.currentPlayer === 'black') {
-        // 切换到 AI 并显示思考状态
-        this.currentPlayer = 'white'
+      // AI 移动
+      if (this.gameMode === 'pve' && this.currentPlayer === 'white' && !this.gameOver) {
+        // 禁用玩家操作
         this.canMove = false
-        this.isAIThinking = true
         
-        // AI 延迟落子 (0.1-0.3秒随机)
+        // 立即获取 AI 的移动
+        const move = this.ai.getMove(this.board)
+        
+        // 添加最小延迟以显示思考动画
         setTimeout(() => {
-          this.makeAIMove()
-        }, Math.random() * 200 + 100)
-      } else {
-        // 普通模式下切换玩家
-        this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black'
+          if (move) {
+            // 直接修改棋盘
+            this.board[move.row][move.col] = this.currentPlayer  // 使用当前玩家的颜色（白色）
+            this.moveHistory.push({ row: move.row, col: move.col, player: this.currentPlayer })
+            this.audio?.playPieceSound()
+            
+            // 检查 AI 是否获胜
+            if (this.checkWin(move.row, move.col)) {
+              this.gameOver = true
+              this.winner = this.currentPlayer
+              this.audio?.playWinSound()
+            } else {
+              // 切换回玩家回合
+              this.currentPlayer = 'black'
+            }
+          }
+          // 重新启用玩家操作
+          this.canMove = true
+        }, 50)
       }
     },
-    
-    makeAIMove() {
-      if (!this.ai || this.gameOver) return
-      
-      const [row, col] = this.ai.findBestMove(this.board)
-      if (row !== undefined && col !== undefined) {
-        // AI 落子
-        this.board[row][col] = 'white'
-        this.moveHistory.push({ row, col, player: 'white' })
-        
-        // 检查 AI 是否获胜
-        if (this.checkWin(row, col)) {
-          this.gameOver = true
-          this.winner = 'white'
-          this.isAIThinking = false
-          return
-        }
-        
-        // 检查是否平局
-        if (this.checkDraw()) {
-          this.gameOver = true
-          this.isDraw = true
-          this.isAIThinking = false
-          return
-        }
-        
-        // 切换回玩家
-        this.currentPlayer = 'black'
-        this.canMove = true
-        this.isAIThinking = false
-      }
-    },
-    
     checkWin(row, col) {
       const directions = [
-        [1, 0],  // 水平
-        [0, 1],  // 垂直
-        [1, 1],  // 对角线
-        [1, -1]  // 反对角线
+        [1, 0], [0, 1], [1, 1], [1, -1]
       ]
-      
-      const color = this.board[row][col]
       
       return directions.some(([dx, dy]) => {
         let count = 1
+        let r = row, c = col
         
         // 正向检查
-        for (let i = 1; i < 5; i++) {
-          const newRow = row + dx * i
-          const newCol = col + dy * i
-          if (
-            newRow < 0 || newRow >= 15 ||
-            newCol < 0 || newCol >= 15 ||
-            this.board[newRow][newCol] !== color
-          ) break
+        while (count < 5) {
+          r += dx
+          c += dy
+          if (r < 0 || r >= 15 || c < 0 || c >= 15) break
+          if (this.board[r][c] !== this.currentPlayer) break
           count++
         }
         
         // 反向检查
-        for (let i = 1; i < 5; i++) {
-          const newRow = row - dx * i
-          const newCol = col - dy * i
-          if (
-            newRow < 0 || newRow >= 15 ||
-            newCol < 0 || newCol >= 15 ||
-            this.board[newRow][newCol] !== color
-          ) break
+        r = row
+        c = col
+        while (count < 5) {
+          r -= dx
+          c -= dy
+          if (r < 0 || r >= 15 || c < 0 || c >= 15) break
+          if (this.board[r][c] !== this.currentPlayer) break
           count++
         }
         
         return count >= 5
       })
     },
-    
-    checkDraw() {
-      return this.board.every(row => row.every(cell => cell !== null))
-    },
-    
-    getGameResultText() {
-      if (this.isDraw) {
-        return '平局！'
-      }
-      
-      if (this.gameMode === 'pve') {
-        if (this.winner === 'black') {
-          return '恭喜你获胜！'
-        } else {
-          return 'AI 获胜了！'
-        }
-      } else {
-        return `${this.winner === 'black' ? '黑棋' : '白棋'}获胜！`
-      }
-    },
-    
-    restartGame() {
-      this.board = Array(15).fill().map(() => Array(15).fill(null))
-      this.currentPlayer = 'black'
-      this.moveHistory = []
-      this.gameOver = false
-      this.winner = null
-      this.isDraw = false
-      this.canMove = true
-      this.isAIThinking = false
-    },
-    
-    handleGameAction(action) {
-      switch (action) {
-        case 'undo':
-          this.undoMove()
-          break
-        case 'restart':
-          this.restartGame()
-          break
-        case 'surrender':
-          this.handleSurrender()
-          break
-        case 'back':
-          this.backToMenu()
-          break
-      }
-    },
-
     undoMove() {
       if (this.moveHistory.length === 0) return
       
-      if (this.gameMode === 'pve') {
-        // 在 PvE 模式下，需要撤销两步（玩家和 AI 的移动）
-        for (let i = 0; i < 2; i++) {
-          const lastMove = this.moveHistory.pop()
-          if (lastMove) {
-            this.board[lastMove.row][lastMove.col] = null
-          }
-        }
-        this.currentPlayer = 'black'
-      } else {
-        // 在 PvP 模式下，只撤销一步
-        const lastMove = this.moveHistory.pop()
-        this.board[lastMove.row][lastMove.col] = null
-        this.currentPlayer = lastMove.player
-      }
-      
+      const lastMove = this.moveHistory.pop()
+      this.board[lastMove.row][lastMove.col] = null
+      this.currentPlayer = lastMove.player
       this.gameOver = false
       this.winner = null
-      this.canMove = true
+      
+      if (this.gameMode === 'pve') {
+        // 在 PvE 模式下撤销两步
+        if (this.moveHistory.length > 0) {
+          const aiMove = this.moveHistory.pop()
+          this.board[aiMove.row][aiMove.col] = null
+        }
+      }
     },
-
     handleSurrender() {
       this.gameOver = true
-      if (this.gameMode === 'pve') {
-        this.winner = 'white' // AI 获胜
-      } else {
-        this.winner = this.currentPlayer === 'black' ? 'white' : 'black'
-      }
+      this.winner = this.currentPlayer === 'black' ? 'white' : 'black'
     },
-
+    restartGame() {
+      this.resetGame()
+    },
     backToMenu() {
       this.currentScreen = 'welcome'
-      this.restartGame()
+      this.resetGame()
+      this.selectedMode = null
     },
-
     showSettings() {
-      // 实现设置面板
+      // TODO: 实现设置功能
     },
-    
     showHelp() {
-      // 实现帮助面板
-    },
-    
-    selectMode(mode) {
-      this.selectedMode = mode
-    },
-    
-    selectDifficulty(difficulty) {
-      this.selectedDifficulty = difficulty
-    },
-    
-    startGame() {
-      if (this.selectedMode === 'pve') {
-        this.ai.setDifficulty(this.selectedDifficulty)
-      }
-      this.gameMode = this.selectedMode
-      this.currentScreen = 'game'
-      this.restartGame()
+      // TODO: 实现帮助功能
     }
+  },
+  mounted() {
+    this.audio = setupAudio()
   }
 }
 </script>
@@ -414,26 +340,36 @@ export default {
 <style scoped>
 .welcome-screen {
   min-height: 100vh;
-  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  min-height: 100dvh;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  position: relative;
 }
 
 .welcome-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - 64px);
+  min-height: calc(100dvh - 32px);
+  width: 100%;
 }
 
 .welcome-content {
   background: white;
-  padding: 2rem;
+  padding: 1.5rem;
   border-radius: 1rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   width: 100%;
   text-align: center;
+  max-width: 95vw;
+  max-height: 90dvh;
+  overflow-y: auto;
 }
 
 .welcome-title {
@@ -563,40 +499,85 @@ export default {
 
 @media (max-width: 768px) {
   .welcome-container {
-    padding: 0.75rem;
+    padding: 0.5rem;
+    min-height: 100dvh;
   }
 
   .welcome-content {
-    padding: 1.5rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
   }
 
   .welcome-title {
-    font-size: 2rem;
+    font-size: 1.75rem;
+    margin-bottom: 0;
   }
 
   .welcome-subtitle {
     font-size: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
+  }
+
+  .welcome-options {
+    margin: 0;
+    gap: 0.75rem;
+  }
+
+  .option-section {
+    padding: 0.75rem;
+  }
+
+  .section-title {
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
   }
 
   .mode-buttons,
   .difficulty-buttons {
     grid-template-columns: 1fr;
+    gap: 0.5rem;
   }
 
   .mode-btn,
   .difficulty-btn {
     padding: 0.75rem;
+    min-height: 44px;
   }
 
   .start-btn {
     width: 100%;
-    margin-top: 0.75rem;
+    margin-top: 0.5rem;
+    min-height: 44px;
+  }
+}
+
+/* 修复移动端滚动问题 */
+@media (max-width: 768px) {
+  body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  #app {
+    height: 100%;
+    height: 100dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .welcome-content::-webkit-scrollbar {
+    display: none;
   }
 }
 
 .game-screen {
-  height: 100vh;
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background: var(--background-color);
@@ -607,59 +588,140 @@ export default {
   display: flex;
   padding: 1rem;
   gap: 1rem;
-  max-height: calc(100vh - 64px);
-  overflow: hidden;
-  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
   align-items: center;
+  justify-content: center;
 }
 
 .game-sidebar {
+  width: 240px;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  width: 200px;
+  gap: 1rem;
+  align-self: stretch;
+  justify-content: center;
 }
 
 .game-content {
-  flex: none;
-  width: min(calc(100vh - 96px), calc(100vw - 440px));
-  height: min(calc(100vh - 96px), calc(100vw - 440px));
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  flex: 1;
+  max-width: 600px;
+  aspect-ratio: 1;
 }
 
 .game-controls {
+  width: 240px;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  width: 200px;
+  gap: 1rem;
+}
+
+.control-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: white;
+  color: var(--text-color);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.control-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* 移动端适配 */
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .game-layout {
     flex-direction: column;
     padding: 0.5rem;
-    gap: 0.5rem;
+    gap: 0.75rem;
   }
 
-  .game-sidebar {
-    flex-direction: row;
-    justify-content: center;
-    width: 100%;
-  }
-
-  .game-content {
-    width: min(calc(100vh - 200px), 100%);
-    height: min(calc(100vh - 200px), 100%);
-  }
-
+  .game-sidebar,
   .game-controls {
     width: 100%;
     flex-direction: row;
-    justify-content: center;
     flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .game-content {
+    width: 100%;
+    max-width: none;
+    padding: 0.5rem;
+  }
+
+  .control-btn {
+    flex: 1;
+    min-width: 120px;
+    max-width: 160px;
+  }
+
+  .game-sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .player-card {
+    flex: 1;
+    min-width: 150px;
+    max-width: 200px;
+  }
+}
+
+/* 小屏幕手机适配 */
+@media (max-width: 360px) {
+  .welcome-content {
+    padding: 1rem;
+  }
+
+  .welcome-title {
+    font-size: 1.5rem;
+  }
+
+  .welcome-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .mode-btn,
+  .difficulty-btn {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* 防止页面滚动和橡皮筋效果 */
+@media (max-width: 1024px) {
+  body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  #app {
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -714,5 +776,40 @@ export default {
 .result-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+}
+
+/* 欢迎界面顶部按钮 */
+.welcome-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  z-index: 100;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.icon-btn i {
+  font-size: 1.2rem;
 }
 </style> 

@@ -1,39 +1,29 @@
 <template>
   <div class="player-card" :class="{ active: isActive }">
+    <div class="player-piece" :class="pieceColor"></div>
     <div class="player-info">
-      <div class="player-piece" :class="pieceColor"></div>
       <div class="player-name">
         {{ name }}
-        <span v-if="isAi" class="ai-badge">AI</span>
+        <i v-if="isAi" class="fa-solid fa-robot"></i>
       </div>
-    </div>
-    <div v-if="isThinking" class="thinking-indicator">
-      思考中...
-      <i class="fa-solid fa-circle-notch fa-spin"></i>
+      <div class="player-status" v-if="isActive && !isThinking">
+        轮到你了
+      </div>
+      <div class="player-status thinking" v-if="isActive && isThinking">
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+        思考中...
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'PlayerCard',
   props: {
-    name: {
-      type: String,
-      required: true
-    },
-    pieceColor: {
-      type: String,
-      required: true
-    },
-    isActive: {
-      type: Boolean,
-      default: false
-    },
-    isAi: {
-      type: Boolean,
-      default: false
-    },
+    name: String,
+    pieceColor: String,
+    isActive: Boolean,
+    isAi: Boolean,
     isThinking: {
       type: Boolean,
       default: false
@@ -45,29 +35,25 @@ export default {
 <style scoped>
 .player-card {
   background: white;
+  border-radius: 1rem;
   padding: 1rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 2px 4px var(--shadow-color);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s;
 }
 
 .player-card.active {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px var(--shadow-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border: 2px solid var(--primary-color);
 }
 
-.player-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
 .player-piece {
-  width: 2rem;
-  height: 2rem;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  border: 2px solid var(--border-color);
 }
 
 .player-piece.black {
@@ -76,28 +62,30 @@ export default {
 
 .player-piece.white {
   background: white;
+  border: 2px solid #ddd;
 }
 
-.player-details {
-  display: flex;
-  flex-direction: column;
+.player-info {
+  flex: 1;
 }
 
 .player-name {
   font-weight: 500;
-}
-
-.player-type {
-  font-size: 0.875rem;
-  color: var(--secondary-color);
-}
-
-.thinking-indicator {
-  font-size: 0.9rem;
-  color: var(--primary-color);
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 0.5rem;
+}
+
+.player-status {
+  font-size: 0.9rem;
+  color: var(--primary-color);
+  margin-top: 0.25rem;
+}
+
+.thinking {
+  color: var(--secondary-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 </style> 
