@@ -3,15 +3,12 @@ import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   plugins: [vue()],
-  build: {
-    outDir: 'dist'
-  },
   server: {
-    proxy: {
-      '/socket.io': {
-        target: 'http://localhost:3000',
-        ws: true
-      }
-    }
+    host: true,
+    port: 4173
+  },
+  preview: {
+    host: true,
+    port: 4173
   }
 }) 

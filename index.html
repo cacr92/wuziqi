@@ -8,16 +8,26 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" href="/icons/icon-192x192.png">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#4CAF50">
+    <style>
+      :root { color-scheme: light dark; }
+    </style>
+    <meta name="application-name" content="五子棋">
+    <meta name="application-chrome-color" content="#4CAF50">
     <meta name="msapplication-navbutton-color" content="#4CAF50">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="五子棋">
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+    <meta name="description" content="一个支持单机和在线对战的五子棋游戏">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/main.ts"></script>
+    <noscript>
+      <strong>很抱歉，该网站需要启用 JavaScript 才能运行。</strong>
+    </noscript>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {

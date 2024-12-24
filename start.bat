@@ -1,31 +1,58 @@
 @echo off
-chcp 65001
-cls
+chcp 65001 > nul
+setlocal enabledelayedexpansion
 
-echo 正在启动五子棋游戏开发服务器...
+:: 设置标题
+title 五子棋游戏启动器
+
+:: 颜色定义
+set "GREEN=\033[32m"
+set "YELLOW=\033[33m"
+set "RED=\033[31m"
+set "RESET=\033[0m"
+
+:: 显示欢迎信息
+echo %GREEN%=================================%RESET%
+echo %YELLOW%    五子棋游戏启动器 v1.0%RESET%
+echo %GREEN%=================================%RESET%
 echo.
 
-:: 获取本机IP地址
-for /f "tokens=2 delims=:" %%a in ('ipconfig ^| findstr /r "IPv4.*[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*"') do (
-    set IP=%%a
+:: 检查必要的工具
+echo %YELLOW%正在检查环境...%RESET%
+where node >nul 2>nul
+if %errorlevel% neq 0 (
+    echo %RED%错误: 未安装 Node.js，请先安装 Node.js%RESET%
+    pause
+    exit /b 1
 )
-set IP=%IP:~1%
 
-echo ========================================
-echo 在手机上访问项目的方法：
-echo.
-echo 1. 确保手机和电脑连接同一个WiFi网络
-echo 2. 在手机浏览器中访问以下地址：
-echo    http://%IP%:3000
-echo.
-echo 添加到手机主屏幕：
-echo 1. 在手机浏览器中打开上述地址
-echo 2. 点击浏览器菜单的"添加到主屏幕"选项
-echo 3. 根据提示完成安装
-echo ========================================
-echo.
+:: 检查依赖
+echo %YELLOW%正在检查依赖...%RESET%
+if not exist "node_modules" (
+    echo %YELLOW%正在安装依赖...%RESET%
+    call npm install
+    if !errorlevel! neq 0 (
+        echo %RED%错误: 依赖安装失败%RESET%
+        pause
+        exit /b 1
+    )
+)
 
 :: 启动开发服务器
-npm run dev
+echo %YELLOW%正在启动开发服务器...%RESET%
+echo %GREEN%按 Ctrl+C 可以停止服务器%RESET%
+echo.
 
-pause 
+:: 设置延迟启动浏览器的命令
+powershell -Command "Start-Sleep -Seconds 3; Start-Process 'http://127.0.0.1:4173'" >nul 2>nul
+
+:: 尝试启动服务器
+call npm run dev
+
+if %errorlevel% neq 0 (
+    echo %RED%错误: 服务器启动失败%RESET%
+    pause
+    exit /b 1
+)
+
+endlocal
