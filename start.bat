@@ -1,58 +1,49 @@
 @echo off
+cd /d "%~dp0"
+
+:: 设置控制台属性
 chcp 65001 > nul
-setlocal enabledelayedexpansion
+title 五子棋游戏
+color 0A
+mode con cols=80 lines=25
 
-:: 设置标题
-title 五子棋游戏启动器
-
-:: 颜色定义
-set "GREEN=\033[32m"
-set "YELLOW=\033[33m"
-set "RED=\033[31m"
-set "RESET=\033[0m"
-
-:: 显示欢迎信息
-echo %GREEN%=================================%RESET%
-echo %YELLOW%    五子棋游戏启动器 v1.0%RESET%
-echo %GREEN%=================================%RESET%
+echo ================================
+echo      五子棋游戏启动器 v1.0
+echo ================================
 echo.
 
-:: 检查必要的工具
-echo %YELLOW%正在检查环境...%RESET%
+:: 检查环境
+echo 正在检查环境...
 where node >nul 2>nul
 if %errorlevel% neq 0 (
-    echo %RED%错误: 未安装 Node.js，请先安装 Node.js%RESET%
+    color 0C
+    echo [错误] 未安装 Node.js
+    echo 请访问 https://nodejs.org/ 下载安装
     pause
     exit /b 1
 )
 
-:: 检查依赖
-echo %YELLOW%正在检查依赖...%RESET%
+:: 清理环境
+echo 正在清理环境...
+taskkill /f /im node.exe >nul 2>&1
+
+:: 安装依赖
 if not exist "node_modules" (
-    echo %YELLOW%正在安装依赖...%RESET%
-    call npm install
-    if !errorlevel! neq 0 (
-        echo %RED%错误: 依赖安装失败%RESET%
-        pause
-        exit /b 1
-    )
+    echo 正在安装依赖...
+    call npm install >nul 2>&1
 )
 
-:: 启动开发服务器
-echo %YELLOW%正在启动开发服务器...%RESET%
-echo %GREEN%按 Ctrl+C 可以停止服务器%RESET%
-echo.
+:: 启动服务器（完全隐藏窗口）
+echo 正在启动服务器...
+start /b "" cmd /c "npm run server >nul 2>&1"
 
-:: 设置延迟启动浏览器的命令
-powershell -Command "Start-Sleep -Seconds 3; Start-Process 'http://127.0.0.1:4173'" >nul 2>nul
+:: 等待服务器启动
+timeout /t 2 /nobreak > nul
 
-:: 尝试启动服务器
-call npm run dev
+:: 启动浏览器和前端
+echo 正在启动游戏界面...
+start http://localhost:5173
+npm run dev
 
-if %errorlevel% neq 0 (
-    echo %RED%错误: 服务器启动失败%RESET%
-    pause
-    exit /b 1
-)
-
-endlocal
+:: 退出时清理进程
+taskkill /f /im node.exe >nul 2>&1

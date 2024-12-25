@@ -1,39 +1,38 @@
 <template>
   <div 
     class="board-cell"
-    :class="{ 
+    :class="{
       'can-move': canMove && !value,
-      'has-piece': value
+      'last-move': isLastMove
     }"
     @click="$emit('click')"
   >
-    <Piece v-if="value" :color="value" />
+    <div 
+      v-if="value" 
+      class="piece"
+      :class="value"
+    ></div>
   </div>
 </template>
 
-<script lang="ts">
-import { Piece } from './index'
+<script setup lang="ts">
+import type { PlayerColor } from '../../types'
 
-export default {
-  name: 'BoardCell',
-  components: { Piece },
-  props: {
-    value: {
-      type: String,
-      default: null
-    },
-    canMove: {
-      type: Boolean,
-      default: false
-    }
-  }
-}
+defineProps<{
+  value: PlayerColor | null
+  canMove: boolean
+  isLastMove: boolean
+}>()
+
+defineEmits<{
+  (e: 'click'): void
+}>()
 </script>
 
 <style scoped>
 .board-cell {
-  width: 40px;
-  height: 40px;
+  aspect-ratio: 1;
+  background: var(--bg-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,7 +40,35 @@ export default {
   position: relative;
 }
 
-.can-move:hover {
-  background: rgba(255,255,255,0.1);
+.board-cell.can-move:hover {
+  background: var(--bg-hover);
+}
+
+.board-cell.last-move::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.piece {
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.piece.black {
+  background: black;
+  box-shadow: inset 0 4px 8px rgba(255,255,255,0.2);
+}
+
+.piece.white {
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: inset 0 4px 8px rgba(0,0,0,0.1);
 }
 </style> 

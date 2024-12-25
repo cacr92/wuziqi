@@ -1,150 +1,23 @@
-:root {
-  /* 主题色 */
-  --primary: #4A90E2;
-  --success: #50E3C2;
-  --danger: #FF5E5E;
-  --warning: #F7B955;
-  --info: #8B9CC8;
-  
-  /* 中性色 */
-  --bg-light: #F8F9FA;
-  --bg-dark: #2C3E50;
-  --text-light: #FFFFFF;
-  --text-dark: #2C3E50;
-  --border: #E9ECEF;
-  
-  /* 棋盘颜色 */
-  --board-bg: #FFEFD5;
-  --board-line: #8B4513;
-  --piece-black: #2C3E50;
-  --piece-white: #FFFFFF;
-  
-  /* 阴影 */
-  --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
-  
-  /* 动画 */
-  --transition: all 0.3s ease;
+/* 重置默认样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* 暗色主题 */
-.dark-theme {
-  --bg-light: #2C3E50;
-  --bg-dark: #1A2634;
-  --text-light: #FFFFFF;
-  --text-dark: #F8F9FA;
-  --border: #3D4852;
-  --board-bg: #34495E;
-  --board-line: #ECF0F1;
+html, body {
+  height: 100%;
+  font-family: system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* 全局样式 */
-body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background: var(--bg-light);
-  color: var(--text-dark);
-  line-height: 1.5;
+#app {
+  height: 100%;
 }
 
-/* 按钮样式 */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: 8px;
+button {
+  font: inherit;
   border: none;
-  font-weight: 500;
-  font-size: 14px;
+  background: none;
   cursor: pointer;
-  transition: var(--transition);
-  background: var(--bg-light);
-  color: var(--text-dark);
-  box-shadow: var(--shadow-sm);
-}
-
-.btn:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.btn:active {
-  transform: translateY(0);
-}
-
-.btn-primary {
-  background: var(--primary);
-  color: var(--text-light);
-}
-
-.btn-success {
-  background: var(--success);
-  color: var(--text-light);
-}
-
-.btn-danger {
-  background: var(--danger);
-  color: var(--text-light);
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* 卡片样式 */
-.card {
-  background: var(--bg-light);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: var(--shadow-md);
-}
-
-/* 棋盘样式 */
-.game-board {
-  background: var(--board-bg);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: var(--shadow-lg);
-}
-
-/* 棋子样式 */
-.piece {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  transition: var(--transition);
-}
-
-.piece.black {
-  background: var(--piece-black);
-  box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2);
-}
-
-.piece.white {
-  background: var(--piece-white);
-  box-shadow: inset 0 -2px 4px rgba(0,0,0,0.1);
-  border: 1px solid var(--border);
-}
-
-/* 动画 */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.fade-in {
-  animation: fadeIn 0.3s ease;
-}
-
-.slide-up {
-  animation: slideUp 0.3s ease;
 } 

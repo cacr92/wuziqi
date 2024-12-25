@@ -1,0 +1,50 @@
+:root {
+  /* 主题色 */
+  --primary: #4CAF50;
+  --primary-light: #81C784;
+  --primary-dark: #388E3C;
+
+  /* 背景色 */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F5F5F5;
+  --bg-hover: #EEEEEE;
+
+  /* 文字颜色 */
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-disabled: #999999;
+
+  /* 边框 */
+  --border-radius: 8px;
+  --border-color: #E0E0E0;
+
+  /* 动画 */
+  --transition-speed: 0.2s;
+
+  /* 其他 */
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 深色主题 */
+[data-theme="dark"] {
+  --primary: #81C784;
+  --primary-light: #A5D6A7;
+  --primary-dark: #66BB6A;
+
+  --bg-primary: #121212;
+  --bg-secondary: #1E1E1E;
+  --bg-hover: #2C2C2C;
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #B0B0B0;
+  --text-disabled: #707070;
+
+  --border-color: #404040;
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --text-primary: #ffffff;
+} 

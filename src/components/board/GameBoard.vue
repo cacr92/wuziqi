@@ -1,179 +1,135 @@
 <template>
-  <div class="game-board neu-panel">
-    <canvas 
-      ref="boardCanvas"
-      :width="boardSize"
-      :height="boardSize"
-      class="board-grid"
-    ></canvas>
-    <div class="pieces-container">
-      <template v-for="(row, i) in board" :key="i">
-        <div 
+  <div 
+    class="game-board"
+    :class="{ 'can-move': canMove }"
+  >
+    <div class="board-grid">
+      <div 
+        v-for="(row, i) in board"
+        :key="i"
+        class="board-row"
+      >
+        <div
           v-for="(cell, j) in row"
-          :key="`${i}-${j}`"
+          :key="j"
           class="board-cell"
-          @click="handleCellClick(i, j)"
+          :class="{
+            'last-move': isLastMove(i, j),
+            'valid-move': canMove && !cell
+          }"
+          @click="handleClick(i, j)"
         >
-          <Piece 
-            v-if="cell"
-            :color="cell"
-            :class="{ 'last-move': isLastMove(i, j) }"
-          />
           <div 
-            v-else-if="canMove && isValidMove(i, j)"
-            class="hover-indicator"
-            :class="currentPlayer"
-          ></div>
+            v-if="cell"
+            class="piece"
+            :class="cell"
+          />
         </div>
-      </template>
+      </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import Piece from './Piece.vue'
+<script setup lang="ts">
+import { computed } from 'vue'
+import type { Board, PlayerColor } from '../../types'
 
-export default defineComponent({
-  name: 'GameBoard',
-  components: { Piece },
-  props: {
-    board: {
-      type: Array as () => (string | null)[][],
-      required: true
-    },
-    currentPlayer: {
-      type: String,
-      required: true
-    },
-    canMove: {
-      type: Boolean,
-      default: true
-    },
-    lastMove: {
-      type: Object as () => { row: number; col: number } | null,
-      default: null
-    }
-  },
-  data() {
-    return {
-      boardSize: 560,
-      cellSize: 40
-    }
-  },
-  methods: {
-    handleCellClick(row: number, col: number) {
-      if (!this.canMove || !this.isValidMove(row, col)) return
-      this.$emit('move', { row, col })
-    },
-    isValidMove(row: number, col: number): boolean {
-      return !this.board[row][col]
-    },
-    isLastMove(row: number, col: number): boolean {
-      return !!(this.lastMove && this.lastMove.row === row && this.lastMove.col === col)
-    },
-    drawGrid() {
-      const ctx = (this.$refs.boardCanvas as HTMLCanvasElement).getContext('2d')
-      if (!ctx) return
-      
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)'
-      ctx.lineWidth = 1
-      
-      // 画横线
-      for (let i = 0; i <= 14; i++) {
-        ctx.beginPath()
-        ctx.moveTo(this.cellSize / 2, i * this.cellSize + this.cellSize / 2)
-        ctx.lineTo(this.boardSize - this.cellSize / 2, i * this.cellSize + this.cellSize / 2)
-        ctx.stroke()
-      }
-      
-      // 画竖线
-      for (let i = 0; i <= 14; i++) {
-        ctx.beginPath()
-        ctx.moveTo(i * this.cellSize + this.cellSize / 2, this.cellSize / 2)
-        ctx.lineTo(i * this.cellSize + this.cellSize / 2, this.boardSize - this.cellSize / 2)
-        ctx.stroke()
-      }
+const props = defineProps<{
+  board: Board
+  currentPlayer: PlayerColor
+  canMove: boolean
+  lastMove?: { row: number; col: number } | null
+}>()
 
-      // 画天元和星位
-      const points = [
-        [3, 3], [3, 11], [7, 7], [11, 3], [11, 11]
-      ]
-      points.forEach(([x, y]) => {
-        ctx.beginPath()
-        ctx.arc(x * this.cellSize + this.cellSize / 2, y * this.cellSize + this.cellSize / 2, 3, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
-        ctx.fill()
-      })
-    }
-  },
-  mounted() {
-    this.drawGrid()
-  }
-})
+const emit = defineEmits<{
+  (e: 'move', row: number, col: number): void
+}>()
+
+const isLastMove = (row: number, col: number) => {
+  return props.lastMove?.row === row && props.lastMove?.col === col
+}
+
+const handleClick = (row: number, col: number) => {
+  if (!props.canMove || props.board[row][col]) return
+  emit('move', row, col)
+}
 </script>
 
 <style scoped>
 .game-board {
   position: relative;
-  margin: 0 auto;
+  aspect-ratio: 1;
   background: var(--board-bg);
-  border-radius: 12px;
-  padding: 20px;
-  width: fit-content;
+  border-radius: var(--border-radius);
+  padding: 1rem;
 }
 
 .board-grid {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  z-index: 1;
+  display: grid;
+  grid-template-rows: repeat(15, 1fr);
+  gap: 1px;
+  height: 100%;
+  background: var(--grid-color);
 }
 
-.pieces-container {
-  position: relative;
-  z-index: 2;
+.board-row {
   display: grid;
-  grid-template-columns: repeat(15, 40px);
-  gap: 0;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 1px;
 }
 
 .board-cell {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   position: relative;
+  background: var(--board-bg);
+  cursor: pointer;
+  transition: all var(--transition-speed);
 }
 
-.hover-indicator {
-  width: 36px;
-  height: 36px;
+.board-cell::before {
+  content: '';
+  display: block;
+  padding-bottom: 100%;
+}
+
+.piece {
+  position: absolute;
+  inset: 10%;
   border-radius: 50%;
-  opacity: 0;
-  transition: opacity 0.2s;
+  transition: all var(--transition-speed);
 }
 
-.board-cell:hover .hover-indicator {
-  opacity: 0.3;
+.piece.black {
+  background: radial-gradient(circle at 30% 30%, #666, #000);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.hover-indicator.black {
-  background: var(--piece-black);
-}
-
-.hover-indicator.white {
-  background: var(--piece-white);
+.piece.white {
+  background: radial-gradient(circle at 30% 30%, #fff, #ddd);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .last-move::after {
   content: '';
   position: absolute;
-  width: 10px;
-  height: 10px;
+  inset: 0;
+  border: 2px solid var(--primary);
   border-radius: 50%;
-  background: var(--accent-color);
   animation: pulse 2s infinite;
+}
+
+.valid-move:hover {
+  background: var(--primary-light);
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.2); opacity: 0; }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .game-board {
+    padding: 0.5rem;
+  }
 }
 </style> 

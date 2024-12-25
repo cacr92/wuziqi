@@ -1,29 +1,62 @@
 <template>
-  <div class="game-tutorial">
-    <h2>游戏教程</h2>
-    <div class="tutorial-content">
-      <p>1. 黑子先手，双方轮流落子</p>
-      <p>2. 五子连成一线（横、竖、斜）即可获胜</p>
-      <p>3. 人机对战时，玩家执黑子</p>
-    </div>
-    <button @click="$emit('close')">
-      <i class="fas fa-times"></i>
-      关闭
+  <div class="tutorial">
+    <h3>游戏规则</h3>
+    <ul>
+      <li>黑白双方轮流落子</li>
+      <li>先形成五子连线的一方获胜</li>
+      <li>连线可以是横向、纵向或斜向</li>
+    </ul>
+    <h3>操作说明</h3>
+    <ul>
+      <li>点击棋盘空白处落子</li>
+      <li>点击撤销可以回退一步</li>
+      <li>点击重新开始可以重新游戏</li>
+    </ul>
+    <button class="close-btn" @click="$emit('close')">
+      知道了
     </button>
   </div>
 </template>
 
-<script lang="ts">
-export default {
-  name: 'GameTutorial'
-}
+<script setup lang="ts">
+defineEmits<{
+  (e: 'close'): void
+}>()
 </script>
 
 <style scoped>
-.game-tutorial {
-  padding: 1rem;
-  background: var(--bg-primary);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+.tutorial {
+  padding: 2rem;
+  color: var(--text-primary);
+}
+
+h3 {
+  margin: 1rem 0;
+  color: var(--primary);
+}
+
+ul {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+}
+
+li {
+  margin: 0.5rem 0;
+}
+
+.close-btn {
+  margin-top: 2rem;
+  padding: 0.5rem 2rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.close-btn:hover {
+  opacity: 0.9;
 }
 </style> 

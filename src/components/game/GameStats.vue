@@ -1,99 +1,76 @@
 <template>
-  <div class="game-stats">
-    <h2>游戏统计</h2>
-    <div class="stats-grid">
-      <div class="stat-item">
-        <div class="stat-label">总局数</div>
-        <div class="stat-value">{{ stats.totalGames }}</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">胜利</div>
-        <div class="stat-value">{{ stats.wins }}</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">失败</div>
-        <div class="stat-value">{{ stats.losses }}</div>
-      </div>
+  <div class="stats">
+    <h3>游戏统计</h3>
+    <div class="stat-item">
+      <span>胜利</span>
+      <span>{{ stats.wins }}</span>
     </div>
+    <div class="stat-item">
+      <span>失败</span>
+      <span>{{ stats.losses }}</span>
+    </div>
+    <div class="stat-item">
+      <span>胜率</span>
+      <span>{{ winRate }}%</span>
+    </div>
+    <button class="close-btn" @click="$emit('close')">
+      关闭
+    </button>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import { useGameStore } from '../../store/game'
+<script setup lang="ts">
+import { computed } from 'vue'
+import type { GameStats } from '../../types'
 
-export default defineComponent({
-  name: 'GameStats',
-  setup() {
-    const gameStore = useGameStore()
-    return {
-      stats: gameStore.stats
-    }
-  }
+const props = defineProps<{
+  stats: GameStats
+}>()
+
+defineEmits<{
+  (e: 'close'): void
+}>()
+
+const winRate = computed(() => {
+  const total = props.stats.wins + props.stats.losses
+  if (total === 0) return 0
+  return Math.round((props.stats.wins / total) * 100)
 })
 </script>
 
 <style scoped>
-.game-stats {
-  padding: 1.5rem;
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-sm);
-}
-
-h2 {
-  font-size: 1.25rem;
-  font-weight: 600;
+.stats {
+  padding: 2rem;
   color: var(--text-primary);
-  margin-bottom: 1rem;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
+h3 {
+  margin-bottom: 2rem;
+  text-align: center;
+  color: var(--primary);
 }
 
 .stat-item {
-  text-align: center;
-  padding: 1rem;
-  background: var(--bg-primary);
-  border-radius: var(--border-radius);
-  transition: var(--transition);
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem 0;
+  font-size: 1.2rem;
 }
 
-.stat-item:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+.close-btn {
+  margin-top: 2rem;
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
-.stat-label {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
-}
-
-.stat-value {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-@media (max-width: 768px) {
-  .game-stats {
-    padding: 1rem;
-  }
-  
-  .stats-grid {
-    gap: 0.5rem;
-  }
-  
-  .stat-item {
-    padding: 0.75rem;
-  }
-  
-  .stat-value {
-    font-size: 1.25rem;
-  }
+.close-btn:hover {
+  opacity: 0.9;
 }
 </style> 

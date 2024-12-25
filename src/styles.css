@@ -11,6 +11,10 @@
   /* 通用样式变量 */
   --border-radius: 8px;
   --transition-speed: 0.3s;
+  --primary: #4CAF50;
+  --bg-dark: #1a1a1a;
+  --text-light: #ffffff;
+  --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* 重置样式 */
@@ -25,6 +29,9 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
 }
 
 /* 按钮样式 */
@@ -41,6 +48,7 @@ body {
   justify-content: center;
   gap: 0.5rem;
   font-size: 1rem;
+  font-family: inherit;
 }
 
 .btn.primary {

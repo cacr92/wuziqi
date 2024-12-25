@@ -1,31 +1,34 @@
 # Dependencies
-node_modules/
-.pnp/
+node_modules
+.pnp
 .pnp.js
 
 # Build
-dist/
-build/
+dist
+dist-ssr
+*.local
 
 # Testing
-coverage/
+coverage
 
-# IDE
-.vscode/
-.idea/
-*.sublime-workspace
-*.sublime-project
-
-# OS
-.DS_Store
-Thumbs.db
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-logs/
-*.log
+pnpm-debug.log*
+lerna-debug.log*
 
 # Environment
 .env
@@ -34,6 +37,6 @@ logs/
 .env.test.local
 .env.production.local
 
-# Cache
-.cache/
-.npm/
+# OS
+.DS_Store
+Thumbs.db 

@@ -1,127 +1,244 @@
 <template>
   <div class="welcome-screen">
-    <div class="welcome-container">
-      <div class="logo-container">
-        <div class="logo">
-          <div class="piece black"></div>
-          <div class="piece white"></div>
+    <div class="welcome-content">
+      <div class="brand">
+        <div class="brand-logo">
+          <div class="logo-ring"></div>
+          <div class="logo-piece"></div>
         </div>
-        <h1>五子棋</h1>
-        <p class="subtitle">现代化的五子棋游戏体验</p>
+        <h1 class="brand-text">
+          <span class="brand-title">五子棋</span>
+          <span class="brand-subtitle">GOBANG</span>
+        </h1>
       </div>
 
-      <div class="mode-selection">
-        <button 
-          class="btn btn-primary"
-          @click="$emit('start', 'pve')"
-        >
-          <i class="fas fa-robot"></i>
-          <span>人机对战</span>
-          <small>挑战智能AI</small>
+      <div class="menu">
+        <button class="menu-btn primary" @click="emit('start', 'pve')">
+          <div class="btn-content">
+            <div class="btn-icon">
+              <i class="fas fa-robot"></i>
+            </div>
+            <div class="btn-text">
+              <span class="btn-title">人机对战</span>
+              <span class="btn-desc">挑战AI对手</span>
+            </div>
+          </div>
         </button>
 
-        <button 
-          class="btn btn-primary"
-          @click="$emit('start', 'online')"
-        >
-          <i class="fas fa-globe"></i>
-          <span>在线对战</span>
-          <small>全球玩家匹配</small>
+        <button class="menu-btn" @click="emit('start', 'online')">
+          <div class="btn-content">
+            <div class="btn-icon">
+              <i class="fas fa-globe"></i>
+            </div>
+            <div class="btn-text">
+              <span class="btn-title">在线对战</span>
+              <span class="btn-desc">全球玩家匹配</span>
+            </div>
+          </div>
         </button>
       </div>
 
-      <div class="quick-actions">
-        <button class="btn" @click="$emit('tutorial')">
-          <i class="fas fa-question-circle"></i>
+      <nav class="quick-actions">
+        <button class="action-btn" @click="emit('tutorial')">
+          <i class="fas fa-graduation-cap"></i>
           <span>教程</span>
         </button>
-        <button class="btn" @click="$emit('settings')">
+        <button class="action-btn" @click="emit('settings')">
           <i class="fas fa-cog"></i>
           <span>设置</span>
         </button>
-        <button class="btn" @click="$emit('stats')">
+        <button class="action-btn" @click="emit('stats')">
           <i class="fas fa-trophy"></i>
-          <span>战绩</span>
+          <span>统计</span>
         </button>
-      </div>
+      </nav>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-
-export default defineComponent({
-  name: 'WelcomeScreen',
-  emits: ['start', 'tutorial', 'settings', 'stats']
-})
+<script setup lang="ts">
+const emit = defineEmits<{
+  (e: 'start', mode: 'pve' | 'online'): void
+  (e: 'tutorial'): void
+  (e: 'settings'): void
+  (e: 'stats'): void
+}>()
 </script>
 
 <style scoped>
 .welcome-screen {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--bg-dark), var(--primary));
-  color: var(--text-light);
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: #0f172a;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
 }
 
-.welcome-container {
-  max-width: 800px;
-  padding: 2rem;
+.welcome-screen::before {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle at center,
+    rgba(56, 189, 248, 0.1) 0%,
+    rgba(56, 189, 248, 0) 70%
+  );
+  animation: pulse 8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.1); }
+}
+
+.welcome-content {
+  width: min(90%, 400px);
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  z-index: 1;
+}
+
+.brand {
   text-align: center;
 }
 
-.logo-container {
-  margin-bottom: 3rem;
-}
-
-.logo {
-  width: 120px;
-  height: 120px;
-  margin: 0 auto 1rem;
+.brand-logo {
   position: relative;
-  animation: float 6s ease-in-out infinite;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 1.5rem;
 }
 
-.piece {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+.logo-ring {
   position: absolute;
-  box-shadow: var(--shadow-lg);
+  inset: 0;
+  border: 4px solid rgba(56, 189, 248, 0.2);
+  border-radius: 50%;
+  animation: rotate 10s linear infinite;
 }
 
-.piece.black {
-  background: var(--piece-black);
-  left: 20px;
-  top: 20px;
+.logo-ring::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 4px solid transparent;
+  border-top-color: #38bdf8;
+  border-radius: 50%;
 }
 
-.piece.white {
-  background: var(--piece-white);
-  right: 20px;
-  bottom: 20px;
+.logo-piece {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: #38bdf8;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
 }
 
-h1 {
-  font-size: 3rem;
-  margin: 0;
-  text-shadow: var(--shadow-lg);
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.subtitle {
-  font-size: 1.2rem;
-  opacity: 0.8;
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.mode-selection {
+.brand-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(to right, #38bdf8, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(56, 189, 248, 0.3));
+}
+
+.brand-subtitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.5em;
+  color: #64748b;
+}
+
+.menu {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
-  margin-bottom: 3rem;
+}
+
+.menu-btn {
+  position: relative;
+  width: 100%;
+  padding: 1.25rem;
+  border: none;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.menu-btn::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: 15px;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.03), transparent);
+  z-index: -1;
+}
+
+.menu-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.menu-btn.primary {
+  background: linear-gradient(135deg, #38bdf8, #818cf8);
+}
+
+.menu-btn.primary::before {
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.1), transparent);
+}
+
+.btn-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 1.25rem;
+  color: white;
+}
+
+.btn-text {
+  text-align: left;
+  color: white;
+}
+
+.btn-title {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.btn-desc {
+  display: block;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .quick-actions {
@@ -130,14 +247,60 @@ h1 {
   gap: 1rem;
 }
 
-@media (max-width: 768px) {
-  .mode-selection {
-    grid-template-columns: 1fr;
-  }
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #64748b;
+  transition: all 0.2s ease;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
+.action-btn i {
+  font-size: 1.25rem;
 }
-</style> 
+
+.action-btn span {
+  font-size: 0.75rem;
+}
+
+.action-btn:hover {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+  transform: translateY(-2px);
+}
+
+@media (max-height: 600px) {
+  .welcome-content {
+    gap: 2rem;
+  }
+
+  .brand-logo {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 1rem;
+  }
+
+  .logo-piece {
+    width: 32px;
+    height: 32px;
+  }
+
+  .brand-title {
+    font-size: 2rem;
+  }
+
+  .menu-btn {
+    padding: 1rem;
+  }
+
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+  }
+}
+</style>
