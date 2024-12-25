@@ -19,7 +19,9 @@ if %errorlevel% neq 0 (
     color 0C
     echo [错误] 未安装 Node.js
     echo 请访问 https://nodejs.org/ 下载安装
+    echo 建议选择 LTS 长期支持版本
     pause
+    start https://nodejs.org/
     exit /b 1
 )
 
@@ -29,19 +31,30 @@ taskkill /f /im node.exe >nul 2>&1
 
 :: 安装依赖
 if not exist "node_modules" (
-    echo 正在安装依赖...
-    call npm install >nul 2>&1
+    echo 首次运行，正在安装依赖...
+    call npm install
+    if %errorlevel% neq 0 (
+        color 0C
+        echo [错误] 依赖安装失败
+        echo 请检查网络连接或手动运行: npm install
+        pause
+        exit /b 1
+    )
 )
 
-:: 启动服务器（完全隐藏窗口）
-echo 正在启动服务器...
+:: 启动服务器
+echo 正在启动游戏服务...
 start /b "" cmd /c "npm run server >nul 2>&1"
 
 :: 等待服务器启动
 timeout /t 2 /nobreak > nul
 
-:: 启动浏览器和前端
+:: 启动游戏
 echo 正在启动游戏界面...
+echo 游戏启动成功！请在浏览器中进行游戏
+echo.
+echo 本地访问地址：http://localhost:5173
+echo ================================
 start http://localhost:5173
 npm run dev
 
