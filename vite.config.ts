@@ -23,6 +23,9 @@ export default defineConfig({
       usePolling: true,  // 使用轮询监听文件变化
       interval: 100,     // 轮询间隔
     },
+    headers: {
+      'Content-Type': 'application/javascript'
+    }
   },
   
   css: {
@@ -42,5 +45,10 @@ export default defineConfig({
   build: {
     sourcemap: true,  // 生成 sourcemap
     chunkSizeWarningLimit: 1000,  // 提高代码分块大小警告限制
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    }
   }
 })
