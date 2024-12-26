@@ -1,122 +1,122 @@
 <template>
-  <div class="game-timer">
-    <div 
-      class="timer"
-      :class="{ 
-        'active': isActive,
-        'warning': timeLeft <= 10
-      }"
-    >
+  <div class="timer-container" :class="{ warning: timeLeft <= 10 }">
+    <div class="timer-icon">
+      <i class="fas fa-hourglass-half"></i>
+    </div>
+    <div class="timer-display">
       {{ formatTime(timeLeft) }}
+    </div>
+    <div class="timer-progress">
+      <div 
+        class="progress-bar"
+        :style="{ width: `${(timeLeft / TIME_LIMIT) * 100}%` }"
+      ></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import type { PlayerColor } from '../../types'
 
 const props = defineProps<{
   currentPlayer: PlayerColor
-  gameStarted: boolean
-  gameOver: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'time-up'): void
+  (e: 'time-up', player: PlayerColor): void
 }>()
 
 const TIME_LIMIT = 30 // 30秒
 const timeLeft = ref(TIME_LIMIT)
-const timer = ref<NodeJS.Timeout | null>(null)
-
-const isActive = computed(() => {
-  return props.gameStarted && !props.gameOver
-})
+let timer: ReturnType<typeof setInterval> | null = null
 
 const formatTime = (seconds: number) => {
   return `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, '0')}`
 }
 
 const startTimer = () => {
-  if (timer.value) clearInterval(timer.value)
   timeLeft.value = TIME_LIMIT
+  if (timer) clearInterval(timer)
   
-  timer.value = setInterval(() => {
-    if (timeLeft.value > 0) {
-      timeLeft.value--
-    } else {
-      if (timer.value) clearInterval(timer.value)
-      emit('time-up')
+  timer = setInterval(() => {
+    timeLeft.value--
+    if (timeLeft.value <= 0) {
+      if (timer) clearInterval(timer)
+      emit('time-up', props.currentPlayer)
     }
   }, 1000)
 }
 
-watch(
-  () => props.currentPlayer,
-  () => {
-    if (isActive.value) {
-      startTimer()
-    }
-  }
-)
+watch(() => props.currentPlayer, startTimer)
 
-watch(
-  () => props.gameStarted,
-  (newVal) => {
-    if (newVal) {
-      startTimer()
-    } else if (timer.value) {
-      clearInterval(timer.value)
-    }
-  }
-)
-
-watch(
-  () => props.gameOver,
-  (newVal) => {
-    if (newVal && timer.value) {
-      clearInterval(timer.value)
-    }
-  }
-)
-
+onMounted(startTimer)
 onUnmounted(() => {
-  if (timer.value) clearInterval(timer.value)
+  if (timer) clearInterval(timer)
 })
 </script>
 
 <style scoped>
-.game-timer {
-  display: flex;
-  justify-content: center;
-  margin: 1rem 0;
-}
-
-.timer {
-  font-size: 2rem;
-  font-weight: bold;
-  padding: 0.5rem 2rem;
-  border-radius: 8px;
+.timer-container {
   background: var(--bg-secondary);
-  color: var(--text-secondary);
-  opacity: 0.5;
-  transition: all 0.3s;
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
-.timer.active {
-  opacity: 1;
+.timer-container.warning {
+  animation: shake 0.5s;
+}
+
+.timer-icon {
+  color: var(--primary);
+  font-size: 1.25rem;
+  animation: rotate 2s linear infinite;
+}
+
+.timer-display {
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   color: var(--text-primary);
+  z-index: 1;
 }
 
-.timer.warning {
-  color: var(--danger);
-  animation: pulse 1s infinite;
+.timer-progress {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-primary);
 }
 
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+.progress-bar {
+  height: 100%;
+  background: var(--primary);
+  opacity: 0.1;
+  transition: width 1s linear;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.warning .timer-icon,
+.warning .timer-display {
+  color: #DC3545;
+}
+
+.warning .progress-bar {
+  background: #DC3545;
 }
 </style> 

@@ -1,13 +1,13 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
-    <div class="modal-content">
+    <div class="modal-container">
       <div class="modal-header">
-        <h3>{{ title }}</h3>
+        <h2 class="modal-title">{{ title }}</h2>
         <button class="close-btn" @click="$emit('close')">
           <i class="fas fa-times"></i>
         </button>
       </div>
-      <div class="modal-body">
+      <div class="modal-content">
         <slot></slot>
       </div>
     </div>
@@ -27,62 +27,77 @@ defineEmits<{
 <style scoped>
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  animation: fadeIn 0.3s ease;
+  animation: fade-in 0.3s ease-out;
 }
 
-.modal-content {
-  background: var(--bg-primary);
-  border-radius: 12px;
-  width: 90%;
-  max-width: 500px;
+.modal-container {
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  min-width: 320px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow: auto;
   box-shadow: var(--shadow-lg);
-  animation: slideIn 0.3s ease;
+  animation: slide-up 0.3s ease-out;
 }
 
 .modal-header {
-  padding: 1rem;
-  border-bottom: 1px solid var(--border-color);
+  padding: 1.5rem;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--board-border);
 }
 
-.modal-body {
-  padding: 1rem;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 50%;
-  transition: all 0.3s;
-}
-
-.close-btn:hover {
-  background: var(--bg-hover);
+.modal-title {
+  margin: 0;
+  font-size: 1.5rem;
   color: var(--text-primary);
 }
 
-@keyframes fadeIn {
+.close-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: var(--primary);
+  color: var(--text-light);
+}
+
+.modal-content {
+  padding: 1.5rem;
+}
+
+@keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-@keyframes slideIn {
-  from { transform: translateY(-20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+@keyframes slide-up {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style> 

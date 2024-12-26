@@ -1,398 +1,119 @@
 <template>
   <div class="game-board">
-    <div class="operation-hint" v-if="showHint">
-      {{ hintMessage }}
+    <div class="game-info">
+      <div class="player-turn">
+        当前回合: {{ store.currentPlayer === 'black' ? '黑子' : '白子' }}
+      </div>
+      <div v-if="store.gameOver" class="game-result">
+        {{ store.winner === 'black' ? '黑子胜' : '白子胜' }}!
+      </div>
     </div>
-    <canvas 
-      ref="boardCanvas"
-      :width="boardSize"
-      :height="boardSize"
-      @click="handleClick"
-      @mousemove="handleMouseMove"
-      @mouseleave="handleMouseLeave"
-    ></canvas>
-    <div class="board-overlay" v-if="showAnimation">
+
+    <div class="board-container">
       <div 
-        class="piece-animation"
-        :class="animationColor"
-        :style="{ 
-          left: `${animationPos.x}px`,
-          top: `${animationPos.y}px`
-        }"
-      ></div>
+        v-for="(row, i) in store.board" 
+        :key="i" 
+        class="board-row"
+      >
+        <div 
+          v-for="(cell, j) in row" 
+          :key="j"
+          class="board-cell"
+          @click="handleCellClick(i, j)"
+        >
+          <div 
+            v-if="cell" 
+            class="piece"
+            :class="cell"
+          ></div>
+        </div>
+      </div>
     </div>
-    <div 
-      v-if="lastMove"
-      class="last-move-marker"
-      :style="{
-        left: `${lastMove.col * cellSize + cellSize/2}px`,
-        top: `${lastMove.row * cellSize + cellSize/2}px`
-      }"
-    ></div>
+
+    <div class="game-controls">
+      <button @click="store.restart()">重新开始</button>
+      <button @click="store.setGameMode('pve')">人机对战</button>
+      <button @click="store.setGameMode('pvp')">双人对战</button>
+    </div>
   </div>
 </template>
 
-<script>
-import { playSound } from '../utils/audio'
+<script setup lang="ts">
+import { useGameStore } from '../stores/game'
 
-export default {
-  name: 'GameBoard',
-  props: {
-    board: {
-      type: Array,
-      required: true
-    },
-    currentPlayer: {
-      type: String,
-      required: true
-    },
-    canMove: {
-      type: Boolean,
-      default: true
-    },
-    isAITurn: {
-      type: Boolean,
-      default: false
-    }
-  },
+const store = useGameStore()
 
-  data() {
-    return {
-      boardSize: 600,
-      cellSize: 40,
-      hoverPos: null,
-      showAnimation: false,
-      animationColor: '',
-      animationPos: { x: 0, y: 0 },
-      showHint: false,
-      hintMessage: '',
-      lastMove: null,
-      hintTimer: null
-    }
-  },
-
-  mounted() {
-    this.initBoard()
-    window.addEventListener('resize', this.handleResize)
-  },
-
-  beforeUnmount() {
-    window.removeEventListener('resize', this.handleResize)
-  },
-
-  watch: {
-    board: {
-      deep: true,
-      handler() {
-        this.drawBoard()
-      }
-    }
-  },
-
-  methods: {
-    initBoard() {
-      this.handleResize()
-      this.drawBoard()
-    },
-
-    handleResize() {
-      const minSize = Math.min(window.innerWidth - 40, window.innerHeight - 100, 600)
-      this.boardSize = minSize
-      this.cellSize = minSize / 15
-      this.$refs.boardCanvas.width = minSize
-      this.$refs.boardCanvas.height = minSize
-      this.drawBoard()
-    },
-
-    drawBoard() {
-      const ctx = this.$refs.boardCanvas.getContext('2d')
-      ctx.clearRect(0, 0, this.boardSize, this.boardSize)
-
-      const gradient = ctx.createLinearGradient(0, 0, this.boardSize, this.boardSize)
-      gradient.addColorStop(0, '#DCB35C')
-      gradient.addColorStop(0.5, '#E8C170')
-      gradient.addColorStop(1, '#DCB35C')
-      ctx.fillStyle = gradient
-      ctx.fillRect(0, 0, this.boardSize, this.boardSize)
-
-      ctx.globalAlpha = 0.1
-      for (let i = 0; i < this.boardSize; i += 10) {
-        ctx.beginPath()
-        ctx.moveTo(i, 0)
-        ctx.lineTo(i + 5, this.boardSize)
-        ctx.strokeStyle = '#8B4513'
-        ctx.stroke()
-      }
-      ctx.globalAlpha = 1.0
-
-      ctx.strokeStyle = '#000'
-      ctx.lineWidth = 0.5
-      
-      ctx.beginPath()
-      ctx.rect(this.cellSize / 2, this.cellSize / 2, 
-               this.boardSize - this.cellSize, 
-               this.boardSize - this.cellSize)
-      ctx.stroke()
-      
-      for (let i = 0; i < 15; i++) {
-        const pos = i * this.cellSize
-        ctx.lineWidth = i === 0 || i === 14 ? 1.5 : 0.5
-        
-        ctx.beginPath()
-        ctx.moveTo(this.cellSize / 2, pos + this.cellSize / 2)
-        ctx.lineTo(this.boardSize - this.cellSize / 2, pos + this.cellSize / 2)
-        ctx.stroke()
-        
-        ctx.beginPath()
-        ctx.moveTo(pos + this.cellSize / 2, this.cellSize / 2)
-        ctx.lineTo(pos + this.cellSize / 2, this.boardSize - this.cellSize / 2)
-        ctx.stroke()
-      }
-
-      const starPoints = [
-        [3, 3], [3, 11], [7, 7],
-        [11, 3], [11, 11]
-      ]
-      
-      ctx.fillStyle = '#000'
-      starPoints.forEach(([row, col]) => {
-        ctx.beginPath()
-        ctx.arc(
-          col * this.cellSize + this.cellSize / 2,
-          row * this.cellSize + this.cellSize / 2,
-          4, 0, Math.PI * 2
-        )
-        ctx.fill()
-      })
-
-      for (let i = 0; i < 15; i++) {
-        for (let j = 0; j < 15; j++) {
-          if (this.board[i][j]) {
-            this.drawPiece(i, j, this.board[i][j])
-          }
-        }
-      }
-
-      if (this.hoverPos && this.canMove && !this.board[this.hoverPos.row][this.hoverPos.col]) {
-        this.drawPiece(this.hoverPos.row, this.hoverPos.col, this.currentPlayer, true)
-      }
-    },
-
-    drawPiece(row, col, color, isHover = false) {
-      const ctx = this.$refs.boardCanvas.getContext('2d')
-      const x = col * this.cellSize + this.cellSize / 2
-      const y = row * this.cellSize + this.cellSize / 2
-      const radius = this.cellSize * 0.4
-
-      ctx.beginPath()
-      ctx.arc(x, y, radius, 0, Math.PI * 2)
-      
-      if (isHover) {
-        ctx.fillStyle = color === 'black' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)'
-      } else {
-        const gradient = ctx.createRadialGradient(
-          x - radius/3, y - radius/3, radius/10,
-          x, y, radius
-        )
-        
-        if (color === 'black') {
-          gradient.addColorStop(0, '#666')
-          gradient.addColorStop(1, '#000')
-        } else {
-          gradient.addColorStop(0, '#fff')
-          gradient.addColorStop(1, '#ddd')
-        }
-        
-        ctx.fillStyle = gradient
-        ctx.shadowBlur = 4
-        ctx.shadowColor = 'rgba(0,0,0,0.5)'
-      }
-      
-      ctx.fill()
-      
-      if (!isHover) {
-        ctx.beginPath()
-        ctx.arc(x - radius/3, y - radius/3, radius/4, 0, Math.PI * 2)
-        ctx.fillStyle = color === 'black' ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.4)'
-        ctx.fill()
-      }
-      
-      ctx.shadowBlur = 0
-    },
-
-    async playAnimation(row, col, color) {
-      this.animationColor = color
-      this.animationPos = {
-        x: col * this.cellSize,
-        y: row * this.cellSize
-      }
-      this.showAnimation = true
-      this.lastMove = { row, col }
-      
-      playSound('place')
-      
-      await new Promise(resolve => setTimeout(resolve, 300))
-      this.showAnimation = false
-    },
-
-    showOperationHint(message, duration = 2000) {
-      this.hintMessage = message
-      this.showHint = true
-      
-      if (this.hintTimer) {
-        clearTimeout(this.hintTimer)
-      }
-      
-      this.hintTimer = setTimeout(() => {
-        this.showHint = false
-      }, duration)
-    },
-
-    handleClick(event) {
-      if (!this.canMove) {
-        this.showOperationHint('请等待对方落子')
-        return
-      }
-
-      const rect = event.target.getBoundingClientRect()
-      const x = event.clientX - rect.left
-      const y = event.clientY - rect.top
-      const row = Math.floor(y / this.cellSize)
-      const col = Math.floor(x / this.cellSize)
-
-      if (row >= 0 && row < 15 && col >= 0 && col < 15) {
-        if (this.board[row][col]) {
-          this.showOperationHint('此处已有棋子')
-          playSound('error')
-          return
-        }
-        
-        if (!this.isAITurn) {
-          this.$emit('make-move', { row, col })
-        }
-      }
-    },
-
-    handleMouseMove(event) {
-      const rect = event.target.getBoundingClientRect()
-      const x = event.clientX - rect.left
-      const y = event.clientY - rect.top
-      const row = Math.floor(y / this.cellSize)
-      const col = Math.floor(x / this.cellSize)
-
-      if (row >= 0 && row < 15 && col >= 0 && col < 15) {
-        this.hoverPos = { row, col }
-        this.drawBoard()
-      }
-    },
-
-    handleMouseLeave() {
-      this.hoverPos = null
-      this.drawBoard()
-    }
-  }
+const handleCellClick = (row: number, col: number) => {
+  store.makeMove(row, col)
 }
 </script>
 
 <style scoped>
 .game-board {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  margin: 1rem 0;
-  position: relative;
-  transform: perspective(1000px) rotateX(5deg);
-  transition: transform 0.3s;
+  gap: 2rem;
 }
 
-.game-board:hover {
-  transform: perspective(1000px) rotateX(0deg);
-}
-
-canvas {
+.board-container {
+  display: grid;
+  grid-template-rows: repeat(15, 1fr);
+  gap: 1px;
+  background: #deb887;
+  padding: 1rem;
+  border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  transition: all 0.3s;
 }
 
-canvas:hover {
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+.board-row {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 1px;
 }
 
-.operation-hint {
-  position: absolute;
-  top: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  pointer-events: none;
-  animation: fadeInOut 0.3s ease-in-out;
+.board-cell {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
 }
 
-.last-move-marker {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: red;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes fadeInOut {
-  0% { opacity: 0; transform: translate(-50%, -10px); }
-  100% { opacity: 1; transform: translate(-50%, 0); }
-}
-
-@keyframes pulse {
-  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-  50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.5; }
-  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-}
-
-.board-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.piece-animation {
-  position: absolute;
+.piece {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  transform: scale(0);
-  animation: dropIn 0.3s ease-out forwards;
+  position: absolute;
 }
 
-.piece-animation.black {
+.piece.black {
   background: #000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.piece-animation.white {
+.piece.white {
   background: #fff;
   border: 1px solid #ccc;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-@keyframes dropIn {
-  0% {
-    transform: scale(0) translateY(-20px);
-  }
-  70% {
-    transform: scale(1.1) translateY(5px);
-  }
-  100% {
-    transform: scale(1) translateY(0);
-  }
+.game-controls {
+  display: flex;
+  gap: 1rem;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background: #4caf50;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+button:hover {
+  opacity: 0.9;
 }
 </style> 

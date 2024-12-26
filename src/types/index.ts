@@ -1,13 +1,13 @@
-export type GameMode = 'pve' | 'online'
 export type PlayerColor = 'black' | 'white'
+export type GameMode = 'pve' | 'online'
+export type Board = (PlayerColor | null)[][]
+export type Difficulty = 'easy' | 'medium' | 'hard'
 
 export interface Move {
   row: number
   col: number
   player: PlayerColor
 }
-
-export type Board = (PlayerColor | null)[][]
 
 export interface GameState {
   board: Board
@@ -23,11 +23,9 @@ export interface GameStats {
 }
 
 export interface GameSettings {
-  difficulty: 'easy' | 'medium' | 'hard'
+  difficulty: Difficulty
   canUndo: boolean
   isMuted: boolean
 }
 
-export type GameResult = 'win' | 'loss' | 'draw'
-
-export type Difficulty = 'easy' | 'medium' | 'hard' 
+export type GameResult = 'win' | 'loss' | 'lose' | 'draw' 

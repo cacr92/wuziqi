@@ -1,0 +1,48 @@
+:root {
+  /* 主色调 */
+  --primary: #4A90E2;
+  --primary-light: #6AA9F4;
+  --primary-dark: #357ABD;
+  
+  /* 背景色 */
+  --bg-primary: #F8F9FA;
+  --bg-secondary: #FFFFFF;
+  --bg-board: #DEB887;
+  
+  /* 文字颜色 */
+  --text-primary: #2C3E50;
+  --text-secondary: #6C757D;
+  --text-light: #FFFFFF;
+  
+  /* 棋子颜色 */
+  --piece-black: radial-gradient(circle at 30% 30%, #666, #000);
+  --piece-white: radial-gradient(circle at 30% 30%, #fff, #eee);
+  
+  /* 边框和阴影 */
+  --border-radius: 12px;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+  
+  /* 动画 */
+  --transition: all 0.3s ease;
+  
+  /* 棋盘样式 */
+  --board-grain: rgba(139, 69, 19, 0.1);
+  --board-border: rgba(0, 0, 0, 0.1);
+}
+
+.dark-theme {
+  --bg-primary: #1A1A1A;
+  --bg-secondary: #2D2D2D;
+  --bg-board: #8B6B4A;
+  --text-primary: #FFFFFF;
+  --text-secondary: #B0B0B0;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.3);
+  
+  /* 棋盘样式 */
+  --board-grain: rgba(255, 255, 255, 0.05);
+  --board-border: rgba(255, 255, 255, 0.1);
+} 

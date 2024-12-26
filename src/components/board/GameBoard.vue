@@ -1,75 +1,87 @@
 <template>
-  <div 
-    class="game-board"
-    :class="{ 'can-move': canMove }"
-  >
-    <div class="board-grid">
+  <div class="game-board">
+    <div class="game-info">
+      <div class="player-turn">
+        当前回合: {{ store.currentPlayer === 'black' ? '黑子' : '白子' }}
+      </div>
+      <div v-if="store.gameOver" class="game-result">
+        {{ store.winner === 'black' ? '黑子胜' : '白子胜' }}!
+      </div>
+    </div>
+
+    <div class="board-container">
       <div 
-        v-for="(row, i) in board"
-        :key="i"
+        v-for="(row, i) in store.board" 
+        :key="i" 
         class="board-row"
       >
-        <div
-          v-for="(cell, j) in row"
+        <div 
+          v-for="(cell, j) in row" 
           :key="j"
           class="board-cell"
-          :class="{
-            'last-move': isLastMove(i, j),
-            'valid-move': canMove && !cell
+          @click="handleCellClick(i, j)"
+          :class="{ 
+            'can-move': !cell && !store.gameOver && 
+                        (store.gameMode !== 'pve' || store.currentPlayer === 'black')
           }"
-          @click="handleClick(i, j)"
         >
           <div 
-            v-if="cell"
+            v-if="cell" 
             class="piece"
             :class="cell"
-          />
+          ></div>
         </div>
       </div>
+    </div>
+
+    <div class="game-controls">
+      <div class="difficulty-selector" v-if="store.gameMode === 'pve'">
+        <select v-model="difficulty" @change="changeDifficulty">
+          <option value="easy">简单</option>
+          <option value="medium">中等</option>
+          <option value="hard">困难</option>
+        </select>
+      </div>
+      <button @click="store.restart()">重新开始</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { Board, PlayerColor } from '../../types'
+import { ref } from 'vue'
+import { useGameStore } from '../../stores/game'
+import type { Difficulty } from '../../types'
 
-const props = defineProps<{
-  board: Board
-  currentPlayer: PlayerColor
-  canMove: boolean
-  lastMove?: { row: number; col: number } | null
-}>()
+const store = useGameStore()
+const difficulty = ref<Difficulty>('medium')
 
-const emit = defineEmits<{
-  (e: 'move', row: number, col: number): void
-}>()
-
-const isLastMove = (row: number, col: number) => {
-  return props.lastMove?.row === row && props.lastMove?.col === col
+const handleCellClick = (row: number, col: number) => {
+  if (store.gameMode === 'pve' && store.currentPlayer === 'white') return
+  store.makeMove(row, col)
 }
 
-const handleClick = (row: number, col: number) => {
-  if (!props.canMove || props.board[row][col]) return
-  emit('move', row, col)
+const changeDifficulty = () => {
+  store.setDifficulty(difficulty.value)
+  store.restart()
 }
 </script>
 
 <style scoped>
 .game-board {
-  position: relative;
-  aspect-ratio: 1;
-  background: var(--board-bg);
-  border-radius: var(--border-radius);
-  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
 }
 
-.board-grid {
+.board-container {
   display: grid;
   grid-template-rows: repeat(15, 1fr);
   gap: 1px;
-  height: 100%;
-  background: var(--grid-color);
+  background: #deb887;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .board-row {
@@ -79,57 +91,61 @@ const handleClick = (row: number, col: number) => {
 }
 
 .board-cell {
-  position: relative;
-  background: var(--board-bg);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: all var(--transition-speed);
+  position: relative;
+  background: #f5deb3;
 }
 
-.board-cell::before {
-  content: '';
-  display: block;
-  padding-bottom: 100%;
+.board-cell.can-move:hover {
+  background: #eecb8b;
 }
 
 .piece {
-  position: absolute;
-  inset: 10%;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  transition: all var(--transition-speed);
+  position: absolute;
 }
 
 .piece.black {
-  background: radial-gradient(circle at 30% 30%, #666, #000);
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  background: #000;
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.2);
 }
 
 .piece.white {
-  background: radial-gradient(circle at 30% 30%, #fff, #ddd);
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.last-move::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border: 2px solid var(--primary);
-  border-radius: 50%;
-  animation: pulse 2s infinite;
+.game-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 }
 
-.valid-move:hover {
-  background: var(--primary-light);
+.difficulty-selector select {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ddd;
 }
 
-@keyframes pulse {
-  0% { transform: scale(0.8); opacity: 1; }
-  100% { transform: scale(1.2); opacity: 0; }
+button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background: #4caf50;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .game-board {
-    padding: 0.5rem;
-  }
+button:hover {
+  opacity: 0.9;
 }
 </style> 

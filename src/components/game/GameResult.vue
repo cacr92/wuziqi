@@ -56,7 +56,7 @@ defineEmits<{
 const resultIcon = computed(() => {
   switch (props.result) {
     case 'win': return 'fas fa-trophy text-success'
-    case 'lose': return 'fas fa-times-circle text-danger'
+    case 'loss': return 'fas fa-times-circle text-danger'
     default: return 'fas fa-handshake text-info'
   }
 })
