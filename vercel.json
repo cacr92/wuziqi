@@ -12,29 +12,27 @@
   ],
   "routes": [
     {
-      "src": "/assets/(.*)",
+      "src": "^/assets/.*\\.js$",
       "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      },
-      "continue": true
+        "Content-Type": "application/javascript",
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "^/assets/.*\\.(css|jpg|jpeg|png|gif|ico|svg|woff2?)$",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
     },
     {
       "handle": "filesystem"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/javascript"
-        }
-      ]
+      "src": "/.*",
+      "dest": "/index.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
     }
   ]
 } 
