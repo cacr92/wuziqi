@@ -1,4 +1,5 @@
 <template>
+<<<<<<< Updated upstream
   <div id="app" v-cloak>
     <transition name="fade">
       <div class="screen" :key="currentScreen">
@@ -413,6 +414,19 @@ export default {
 
 <style scoped>
 .welcome-screen {
+=======
+  <div class="app">
+    <RouterView v-slot="{ Component }">
+      <Transition name="fade" mode="out-in">
+        <component :is="Component" :key="$route.fullPath" />
+      </Transition>
+    </RouterView>
+  </div>
+</template>
+
+<style>
+.app {
+>>>>>>> Stashed changes
   min-height: 100vh;
   background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
 }
@@ -714,5 +728,38 @@ export default {
 .result-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* 全局样式 */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Noto Sans SC', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  height: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* 主题切换过渡 */
+.app {
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 </style> 

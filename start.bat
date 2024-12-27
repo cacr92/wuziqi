@@ -1,5 +1,6 @@
 @echo off
 chcp 65001 > nul
+<<<<<<< Updated upstream
 title 五子棋游戏启动器 v1.0
 color 0A
 
@@ -101,3 +102,53 @@ pause > nul
 taskkill /f /im node.exe >nul 2>nul
 
 exit /b 0 
+=======
+title 五子棋游戏启动器
+
+:: 创建日志目录
+if not exist logs mkdir logs
+
+:: 清理旧进程
+echo 正在清理旧进程...
+taskkill /F /FI "WINDOWTITLE eq 五子棋后端服务器" > nul 2>&1
+taskkill /F /FI "WINDOWTITLE eq 五子棋前端服务器" > nul 2>&1
+
+:: 等待进程结束
+timeout /t 2 /nobreak > nul
+
+:: 启动后端服务器
+echo 正在启动后端服务器...
+cd server
+start "五子棋后端服务器" cmd /c "npm run dev"
+cd ..
+
+:: 等待后端启动
+echo 等待后端服务器启动...
+timeout /t 5 /nobreak > nul
+
+:: 启动前端服务器
+echo 正在启动前端服务器...
+start "五子棋前端服务器" cmd /c "npm run dev"
+
+:: 显示成功信息
+cls
+echo.
+echo ================================================
+echo               五子棋游戏启动成功！
+echo ------------------------------------------------
+echo 前端地址: http://localhost:5173
+echo 后端地址: http://localhost:3001
+echo ------------------------------------------------
+echo 关闭此窗口将停止所有服务器
+echo ================================================
+echo.
+echo 按任意键停止服务器...
+pause > nul
+
+:: 清理进程
+echo 正在清理进程...
+taskkill /F /FI "WINDOWTITLE eq 五子棋后端服务器" > nul 2>&1
+taskkill /F /FI "WINDOWTITLE eq 五子棋前端服务器" > nul 2>&1
+echo 清理完成！
+timeout /t 2 > nul
+>>>>>>> Stashed changes

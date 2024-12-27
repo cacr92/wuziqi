@@ -1,0 +1,105 @@
+/* 默认亮色主题 */
+:root {
+  /* 主题色 */
+  --primary: #4a90e2;
+  --primary-rgb: 74, 144, 226;
+  --secondary: #6c757d;
+  
+  /* 背景色 */
+  --bg-primary: #f5f7fa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f8f9fa;
+  
+  /* 文字颜色 */
+  --text-primary: #2c3e50;
+  --text-secondary: #6c757d;
+  --text-tertiary: #8492a6;
+  
+  /* 边框和阴影 */
+  --border-color: #e4e7ed;
+  --border-radius: 12px;
+  --border-radius-sm: 8px;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+  
+  /* 棋盘相关 */
+  --board-bg: #e6d5ac;
+  --board-line: rgba(0, 0, 0, 0.3);
+  --piece-black: #000000;
+  --piece-white: #ffffff;
+  --piece-shadow: rgba(0, 0, 0, 0.2);
+  --hint-color: rgba(74, 144, 226, 0.3);
+  
+  /* 动画 */
+  --transition: all 0.3s ease;
+  
+  /* 悬停效果 */
+  --hover-color: rgba(74, 144, 226, 0.1);
+}
+
+/* 暗色主题变量 */
+[data-theme="dark"] {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2c2c2c;
+  --bg-tertiary: #363636;
+  
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --text-tertiary: #808080;
+  
+  --border-color: #404040;
+  --board-bg: #4a4a4a;
+  --board-line: rgba(255, 255, 255, 0.3);
+  
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.4);
+  
+  --hover-color: rgba(74, 144, 226, 0.2);
+}
+
+/* 基础样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* 动画 */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
+}
+
+.floating-piece {
+  position: absolute;
+  border-radius: 50%;
+  animation: float linear infinite;
+  opacity: 0.1;
+  pointer-events: none;
+} 

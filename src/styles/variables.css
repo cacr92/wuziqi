@@ -1,0 +1,70 @@
+:root {
+  /* 主题色 */
+  --primary: #4CAF50;
+  --primary-light: #81C784;
+  --primary-dark: #388E3C;
+  --primary-rgb: 76, 175, 80;
+
+  /* 背景色 */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F5F5F5;
+  --bg-tertiary: #EEEEEE;
+  --bg-hover: #E0E0E0;
+
+  /* 文字颜色 */
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --text-disabled: #CCCCCC;
+
+  /* 边框 */
+  --border-radius: 8px;
+  --border-radius-sm: 4px;
+  --border-color: #E0E0E0;
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 12px rgba(0, 0, 0, 0.15);
+
+  /* 动画 */
+  --transition: all 0.3s ease;
+  --transition-fast: all 0.15s ease;
+
+  /* 棋盘相关 */
+  --board-bg: #DEB887;
+  --board-line: rgba(0, 0, 0, 0.3);
+  --piece-black: radial-gradient(circle at 35% 35%, #333 0%, #000 100%);
+  --piece-white: radial-gradient(circle at 35% 35%, #fff 0%, #eee 100%);
+  --piece-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  /* 状态颜色 */
+  --success: #4CAF50;
+  --warning: #FFC107;
+  --danger: #F44336;
+  --info: #2196F3;
+}
+
+/* 深色主题 */
+[data-theme="dark"] {
+  --primary: #81C784;
+  --primary-light: #A5D6A7;
+  --primary-dark: #66BB6A;
+
+  --bg-primary: #121212;
+  --bg-secondary: #1E1E1E;
+  --bg-hover: #2C2C2C;
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #B0B0B0;
+  --text-disabled: #707070;
+
+  --border-color: #404040;
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --text-primary: #ffffff;
+} 
